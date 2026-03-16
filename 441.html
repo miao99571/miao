@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Homepage - Veda</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Arial", sans-serif;
+        }
+
+        /* 全局背景色（莫兰迪浅灰蓝，替代纯白更舒适） */
+        body {
+            background-color: #eef2f7;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 容器通用样式 */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 导航栏样式（莫兰迪雾霾蓝背景） */
+        .navbar {
+            background-color: #5a7fa5;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 0.5rem 0;
+            position: relative;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        /* 导航激活/hover样式（柔和薄荷绿高亮） */
+        .nav-links a.active,
+        .nav-links a:hover {
+            color: #d1e7dd;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #d1e7dd;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a.active::after,
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 内容区域通用样式 */
+        .content {
+            min-height: calc(100vh - 160px);
+            padding: 3rem 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #5a7fa5;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        h3 {
+            color: #5a7fa5;
+            margin-bottom: 1rem;
+        }
+
+        /* 页面切换样式（默认隐藏） */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 首页样式 */
+        .intro {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .intro p {
+            margin-bottom: 1rem;
+        }
+
+        /* 个人资料页样式 */
+        .profile-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* 头像尺寸已调整为150x150 */
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .profile-info {
+            flex: 1;
+            min-width: 300px;
+            font-size: 1.1rem;
+        }
+
+        .profile-info p {
+            margin-bottom: 1.2rem;
+            line-height: 1.7;
+        }
+
+        .profile-info .about-me {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        /* 画廊页样式 - 核心修改：竖版布局 */
+        .gallery-grid {
+            display: grid;
+            /* 调整列宽为竖版比例，每行最多2列，更适合竖版显示 */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            justify-items: center;
+        }
+
+        .gallery-item {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* 固定竖版容器比例 */
+            width: 280px;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        /* 竖版图片样式：高度远大于宽度，保持原图竖版比例 */
+        .gallery-item img {
+            width: 100%;
+            height: 450px; /* 竖版高度，适配手机/电脑 */
+            object-fit: cover;
+        }
+
+        /* 第一张图单独向上对齐，保证面部完整显示 */
+        .gallery-item img.face-top {
+            object-position: top;
+        }
+
+        .gallery-item p {
+            padding: 1rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #2c3e50;
+        }
+
+        /* 联系页样式 */
+        .contact-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .contact-info, .contact-form {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .contact-info p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #5a7fa5;
+            box-shadow: 0 0 0 3px rgba(90, 127, 165, 0.1);
+        }
+
+        .submit-btn {
+            background-color: #5a7fa5;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #4a6fa5;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 提示框样式 */
+        .tip {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .tip.success {
+            display: block;
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+
+        .tip.error {
+            display: block;
+            background-color: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+        }
+
+        /* 页脚样式 */
+        footer {
+            background-color: #5a7fa5;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式适配（手机端） */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                justify-content: center;
+                width: 100%;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .profile-img {
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                padding: 2rem 0;
+            }
+
+            /* 手机端竖版图片适配 */
+            .gallery-item {
+                width: 100%;
+            }
+            .gallery-item img {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 统一导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">My Personal Homepage</h1>
+            <ul class="nav-links">
+                <li><a class="nav-link active" data-page="home">Homepage</a></li>
+                <li><a class="nav-link" data-page="profile">Personal Information</a></li>
+                <li><a class="nav-link" data-page="gallery">My Gallery</a></li>
+                <li><a class="nav-link" data-page="contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 所有页面内容 -->
+    <main class="content">
+        <div class="container">
+            <!-- 1. 首页 -->
+            <div id="home" class="page active">
+                <section class="intro">
+                    <h2>Welcome to My Personal Space</h2>
+                    <p>Hello! I'm Veda, the creator of this website. It's a pleasure to meet you here.</p>
+                    <p>You can browse my detailed information, appreciate my photography works or contact me directly through the top navigation bar.</p>
+                </section>
+            </div>
+
+            <!-- 2. 个人资料页 -->
+            <div id="profile" class="page">
+                <section class="profile">
+                    <h2>Personal Information</h2>
+                    <div class="profile-card">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/70b9ee2d40aa4e64bea5280d81168732.jpg~tplv-a9rns2rl98-image.png?lk3s=8e244e95&rcl=20260310222058097977382AC37B0E0C8E&rrcfp=dafada99&x-expires=2089376459&x-signature=1i5DFagevQkfdvSifeEUJLtVxgM%3D" alt="Personal Avatar" class="profile-img">
+                        <div class="profile-info">
+                            <p><strong>Name：</strong>Veda</p>
+                            <p><strong>Age：</strong>22</p>
+                            <p><strong>About Me：</strong> Hello everyone. My name is Veda. I am very glad to join this big family and start a new journey in university. I am an open-minded, sincere and responsible person. I get along well with others and enjoy communicating and cooperating with classmates.<br><br>
+In terms of study, I take my courses seriously and keep a positive learning attitude. I am willing to think independently and face challenges bravely. I hope to improve my professional knowledge and practical ability through continuous efforts.<br><br>
+Besides study, I take part in class activities and cherish the chance to grow together with everyone. In my spare time, I like reading and doing sports, which help me relax and broaden my horizons.<br><br>
+I am looking forward to the coming college life. I will work hard, make progress and build precious friendships with all of you. Thank you!</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 3. 画廊页（竖版显示） -->
+            <div id="gallery" class="page">
+                <section class="gallery">
+                    <h2>My Gallery</h2>
+                    <div class="gallery-grid">
+                        <div class="gallery-item">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/373a6cdffceb4b2eb04fb1004888ee5c.jpg~tplv-a9rns2rl98-image.png?lk3s=8e244e95&rcl=2026031109204781009404C68DE70F8987&rrcfp=dafada99&x-expires=2089416048&x-signature=xP9L5buC5zEgt5BJP6MAYVYOASk%3D" alt="Gallery Image 1" class="face-top">
+                            <p>Gallery Image 1</p>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/f413dded859d4fffb53b67414b194569.jpg~tplv-a9rns2rl98-image.png?lk3s=8e244e95&rcl=2026031109204781009404C68DE70F8987&rrcfp=dafada99&x-expires=2089416048&x-signature=23vtq38nFzxpt40yeELzNg3iM8k%3D" alt="Gallery Image 2">
+                            <p>Gallery Image 2</p>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/dd0387f4ed8b4bb6baf3b6335b5593bf.jpg~tplv-a9rns2rl98-image.png?lk3s=8e244e95&rcl=2026031109204781009404C68DE70F8987&rrcfp=dafada99&x-expires=2089416048&x-signature=2Nk3BQ%2B6j7k7p1SGbx5qRV1gSrQ%3D" alt="Gallery Image 3">
+                            <p>Gallery Image 3</p>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/9ca02a1d0fe547d19b7527ab2961dc01.jpg~tplv-a9rns2rl98-image.png?lk3s=8e244e95&rcl=2026031109204781009404C68DE70F8987&rrcfp=dafada99&x-expires=2089416048&x-signature=VqwyreCg%2BC8R7AvGihHGOG32FBY%3D" alt="Gallery Image 4">
+                            <p>Gallery Image 4</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 4. 联系页 -->
+            <div id="contact" class="page">
+                <section class="contact">
+                    <h2>Contact Me</h2>
+                    <div class="contact-wrap">
+                        <div class="contact-info">
+                            <h3>My Contact Information</h3>
+                            <p><strong>Email：</strong>zhishi_0902@qq.com</p>
+                            <p><strong>Telephone：</strong>19557400212</p>
+                            <p><strong>WeChat：</strong>zero</p>
+                            <p><strong>Address：</strong>Xiangshan County, Ningbo City, Zhejiang Province</p>
+                        </div>
+
+                        <div class="contact-form">
+                            <h3>Send Me a Message</h3>
+                            <form id="msgForm">
+                                <div class="form-group">
+                                    <label for="name">Name：</label>
+                                    <input type="text" id="name" placeholder="Please enter your name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email：</label>
+                                    <input type="email" id="email" placeholder="Please enter your email address" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message">Leave a Message：</label>
+                                    <textarea id="message" rows="5" placeholder="Please enter what you want to say to me" required></textarea>
+                                </div>
+                                <button type="submit" class="submit-btn">Send a Message</button>
+                            </form>
+                            <div id="tip" class="tip"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 My Personal Homepage | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. 页面切换逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // 移除所有激活状态
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    pages.forEach(p => p.classList.remove('active'));
+                    
+                    // 激活当前导航和页面
+                    this.classList.add('active');
+                    const targetPage = this.getAttribute('data-page');
+                    document.getElementById(targetPage).classList.add('active');
+                    // 页面切换时平滑回到顶部
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+
+            // 2. 联系表单提交逻辑
+            const form = document.getElementById('msgForm');
+            const tip = document.getElementById('tip');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const message = document.getElementById('message').value.trim();
+
+                // 清空之前的提示
+                tip.className = 'tip';
+                tip.textContent = '';
+
+                if (name && email && message) {
+                    tip.className = 'tip success';
+                    tip.textContent = `Thank you ${name}! Your message has been sent successfully. I will reply to you as soon as possible.`;
+                    form.reset();
+                    setTimeout(() => {
+                        tip.textContent = '';
+                        tip.className = 'tip';
+                    }, 3000);
+                } else {
+                    tip.className = 'tip error';
+                    tip.textContent = 'Please fill in all the required fields!';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
